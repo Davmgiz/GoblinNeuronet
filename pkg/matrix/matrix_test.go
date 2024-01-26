@@ -5,13 +5,17 @@ import (
 	"testing"
 )
 
+// проверка рандома который заполняет матрицы
 func TestRandMatrix(t *testing.T) {
 
+	// 2 проверяющие матрицы
 	matrix1 := RandMatrix(3, 3)
 	matrix2 := RandMatrix(4, 4)
 
+	// если коэф повторяемости элементов матрицы ниже данной границы, то такой рандом нас не устраивает
 	threshold := 0.8
 
+	// подсчет коэф для обеих матриц
 	repeatedMatrix1 := float64(countUniqueElements(matrix1)) / float64(matrix1.rows*matrix1.columns)
 	repeatedMatrix2 := float64(countUniqueElements(matrix2)) / float64(matrix2.rows*matrix2.columns)
 
@@ -25,6 +29,7 @@ func TestRandMatrix(t *testing.T) {
 
 }
 
+// функция считает кол-во повторяющихся элементов во всей матрице
 func countUniqueElements(m *Matrix) int {
 	uniqueElements := make(map[float64]bool)
 	for i := 0; i < m.rows; i++ {
@@ -36,6 +41,7 @@ func countUniqueElements(m *Matrix) int {
 	return len(uniqueElements)
 }
 
+// проверка произведения матриц
 func TestDot(t *testing.T) {
 
 	A := &Matrix{
@@ -73,12 +79,15 @@ func TestDot(t *testing.T) {
 		t.Errorf("It is impossible to multiply matrixes A and B")
 	}
 
-	epsilon := 1e-9
-
+	// проверка размерности получившейся матрицы
 	if result.columns != expected.columns || result.rows != expected.rows {
 		t.Errorf("Don't right dimension. Expected %d * %d, got %d * %d", expected.rows, expected.columns, result.rows, result.columns)
 	}
 
+	// радиус окрестности допущения для вещественных чисел
+	epsilon := 1e-9
+
+	//проверка на равность матриц
 	for i := 0; i < result.rows; i++ {
 		for j := 0; j < result.columns; j++ {
 			if math.Abs(result.arr[i][j]-expected.arr[i][j]) > epsilon {

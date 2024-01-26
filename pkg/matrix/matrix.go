@@ -8,24 +8,24 @@ import (
 	"time"
 )
 
+/*
+Работаем только с указателями на матрицы
+Любая функция или любой метод возвращает указатель на матрицу
+Сама работа с матрицами происходит только по указателю
+*/
+
+// структура матрицы
 type Matrix struct {
-	columns int
-	rows    int
-	arr     [][]float64
-}
-
-func (M *Matrix) GetRows() int {
-	return M.rows
-}
-
-func (M *Matrix) GetColumns() int {
-	return M.rows
+	columns int         // столбцы
+	rows    int         // строки
+	arr     [][]float64 // 2ух мерный массив
 }
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
 }
 
+// функция создает матрицы с элементами из нормального распределения со средним значением 0 и стандартным отклонением 1
 func RandMatrix(rows, columns int) *Matrix {
 	if rows <= 0 || columns <= 0 {
 		panic("RandMatrix: row <= 0 or columns <= 0")
@@ -42,6 +42,7 @@ func RandMatrix(rows, columns int) *Matrix {
 	return matrix
 }
 
+// функция создает пустую матрицу
 func EmptyMatrix(rows, columns int) *Matrix {
 
 	if rows <= 0 || columns <= 0 {
@@ -60,12 +61,14 @@ func EmptyMatrix(rows, columns int) *Matrix {
 	}
 }
 
+// функция выводит на экран
 func (M *Matrix) Show() {
 	for _, row := range M.arr {
 		fmt.Println(row)
 	}
 }
 
+// произведение матрицы A на B
 func (A *Matrix) Dot(B *Matrix) (*Matrix, error) {
 	if A.columns != B.rows {
 		return &Matrix{}, errors.New("Dot: can't multiply matrices")
