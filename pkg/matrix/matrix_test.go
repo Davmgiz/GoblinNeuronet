@@ -1,7 +1,6 @@
 package matrix
 
 import (
-	"math"
 	"testing"
 )
 
@@ -16,8 +15,8 @@ func TestRandMatrix(t *testing.T) {
 	threshold := 0.8
 
 	// подсчет коэф для обеих матриц
-	repeatedMatrix1 := float64(countUniqueElements(matrix1)) / float64(matrix1.rows*matrix1.columns)
-	repeatedMatrix2 := float64(countUniqueElements(matrix2)) / float64(matrix2.rows*matrix2.columns)
+	repeatedMatrix1 := float64(countUniqueElements(matrix1)) / float64(matrix1.matrix.rows*matrix1.matrix.columns)
+	repeatedMatrix2 := float64(countUniqueElements(matrix2)) / float64(matrix2.matrix.rows*matrix2.matrix.columns)
 
 	if repeatedMatrix1 < threshold {
 		t.Errorf("Too many repeated elements in matrix1. Expect %f, got %f", threshold, repeatedMatrix1)
@@ -29,54 +28,32 @@ func TestRandMatrix(t *testing.T) {
 
 }
 
-// функция считает кол-во повторяющихся элементов во всей матрице
-func countUniqueElements(m *Matrix) int {
-	uniqueElements := make(map[float64]bool)
-	for i := 0; i < m.rows; i++ {
-		for j := 0; j < m.columns; j++ {
-			uniqueElements[m.arr[i][j]] = true
-		}
-	}
-
-	return len(uniqueElements)
-}
-
 func TestDot(t *testing.T) {
-
-	A := &Matrix{
-		rows:    3,
-		columns: 2,
-		arr: [][]float64{
-			{1., 2.},
-			{3., 4.},
-			{5., 6.},
-		},
+	a := [][]float64{
+		{1., 2.},
+		{3., 4.},
+		{5., 6.},
 	}
+	A := dataToMatrix(a)
 
-	B := &Matrix{
-		rows:    2,
-		columns: 4,
-		arr: [][]float64{
-			{1., 2., 3., 10.},
-			{4., 5., 6., 9.},
-		},
+	b := [][]float64{
+		{1., 2., 3., 10.},
+		{4., 5., 6., 9.},
 	}
+	B := dataToMatrix(b)
 
-	expected := &Matrix{
-		rows:    3,
-		columns: 4,
-		arr: [][]float64{
-			{9., 12., 15., 28.},
-			{19., 26., 33., 66.},
-			{29., 40., 51., 104.},
-		},
+	e := [][]float64{
+		{9., 12., 15., 28.},
+		{19., 26., 33., 66.},
+		{29., 40., 51., 104.},
 	}
+	expected := dataToMatrix(e)
 
 	result := A.Dot(B)
 
 	// проверка размерности получившейся матрицы
-	if result.columns != expected.columns || result.rows != expected.rows {
-		t.Errorf("Matrix multiplication error: Expected %d * %d, got %d * %d", expected.rows, expected.columns, result.rows, result.columns)
+	if result.GetColumns() != expected.GetColumns() || result.GetRows() != expected.GetRows() {
+		t.Errorf("Matrix multiplication error: Expected %d * %d, got %d * %d", expected.GetRows(), expected.GetColumns(), result.GetRows(), result.GetColumns())
 	}
 
 	// проверка на равность
@@ -86,58 +63,29 @@ func TestDot(t *testing.T) {
 
 }
 
-func isMatrixesEqual(A, B *Matrix) bool {
-
-	// радиус окрестности допущения для вещественных чисел
-	epsilon := 1e-9
-
-	if A.rows != B.rows || A.columns != B.columns {
-		return false
-	}
-
-	// проверка на равность
-	for i := 0; i < A.rows; i++ {
-		for j := 0; j < A.columns; j++ {
-			if math.Abs(A.arr[i][j]-B.arr[i][j]) > epsilon {
-				return false
-			}
-		}
-	}
-	return true
-}
-
 func TestAddition(t *testing.T) {
-	A := &Matrix{
-		rows:    3,
-		columns: 3,
-		arr: [][]float64{
-			{1.0, 2.0, 3.0},
-			{4.0, 5.0, 6.0},
-			{7.0, 8.0, 9.0},
-		},
+	a := [][]float64{
+		{1.0, 2.0, 3.0},
+		{4.0, 5.0, 6.0},
+		{7.0, 8.0, 9.0},
 	}
+	A := dataToMatrix(a)
 
-	B := &Matrix{
-		rows:    3,
-		columns: 3,
-		arr: [][]float64{
-			{9.0, 8.0, 7.0},
-			{6.0, 5.0, 4.0},
-			{3.0, 2.0, 1.0},
-		},
+	b := [][]float64{
+		{9.0, 8.0, 7.0},
+		{6.0, 5.0, 4.0},
+		{3.0, 2.0, 1.0},
 	}
+	B := dataToMatrix(b)
 
-	expected := &Matrix{
-		rows:    3,
-		columns: 3,
-		arr: [][]float64{
-			{10.0, 10.0, 10.0},
-			{10.0, 10.0, 10.0},
-			{10.0, 10.0, 10.0},
-		},
+	e := [][]float64{
+		{10.0, 10.0, 10.0},
+		{10.0, 10.0, 10.0},
+		{10.0, 10.0, 10.0},
 	}
+	expected := dataToMatrix(e)
 
-	result := A.Addition(B)
+	result := A.Add(B)
 
 	//проверка на равность
 	if !isMatrixesEqual(result, expected) {
@@ -146,35 +94,26 @@ func TestAddition(t *testing.T) {
 }
 
 func TestSub(t *testing.T) {
-	A := &Matrix{
-		rows:    3,
-		columns: 3,
-		arr: [][]float64{
-			{1.0, 2.0, 3.0},
-			{4.0, 5.0, 6.0},
-			{7.0, 8.0, 9.0},
-		},
+	a := [][]float64{
+		{1.0, 2.0, 3.0},
+		{4.0, 5.0, 6.0},
+		{7.0, 8.0, 9.0},
 	}
+	A := dataToMatrix(a)
 
-	B := &Matrix{
-		rows:    3,
-		columns: 3,
-		arr: [][]float64{
-			{9.0, 8.0, 7.0},
-			{6.0, 5.0, 4.0},
-			{3.0, 2.0, 1.0},
-		},
+	b := [][]float64{
+		{9.0, 8.0, 7.0},
+		{6.0, 5.0, 4.0},
+		{3.0, 2.0, 1.0},
 	}
+	B := dataToMatrix(b)
 
-	expected := &Matrix{
-		rows:    3,
-		columns: 3,
-		arr: [][]float64{
-			{-8.0, -6.0, -4.0},
-			{-2.0, 0.0, 2.0},
-			{4.0, 6.0, 8.0},
-		},
+	e := [][]float64{
+		{-8.0, -6.0, -4.0},
+		{-2.0, 0.0, 2.0},
+		{4.0, 6.0, 8.0},
 	}
+	expected := dataToMatrix(e)
 
 	result := A.Sub(B)
 
@@ -185,35 +124,26 @@ func TestSub(t *testing.T) {
 }
 
 func TestHadamardProduct(t *testing.T) {
-	A := &Matrix{
-		rows:    3,
-		columns: 3,
-		arr: [][]float64{
-			{1.0, 2.0, 2.0},
-			{-4.0, 0.0, 1.0},
-			{5.0, 3.0, -10.0},
-		},
+	a := [][]float64{
+		{1.0, 2.0, 2.0},
+		{-4.0, 0.0, 1.0},
+		{5.0, 3.0, -10.0},
 	}
+	A := dataToMatrix(a)
 
-	B := &Matrix{
-		rows:    3,
-		columns: 3,
-		arr: [][]float64{
-			{1.0, 5.0, 3.0},
-			{-3.0, 5.0, -4.0},
-			{3.0, 2.0, 1.0},
-		},
+	b := [][]float64{
+		{1.0, 5.0, 3.0},
+		{-3.0, 5.0, -4.0},
+		{3.0, 2.0, 1.0},
 	}
+	B := dataToMatrix(b)
 
-	expected := &Matrix{
-		rows:    3,
-		columns: 3,
-		arr: [][]float64{
-			{1.0, 10.0, 6.0},
-			{12.0, 0.0, -4.0},
-			{15.0, 6.0, -10.0},
-		},
+	e := [][]float64{
+		{1.0, 10.0, 6.0},
+		{12.0, 0.0, -4.0},
+		{15.0, 6.0, -10.0},
 	}
+	expected := dataToMatrix(e)
 
 	result := A.HadamardProduct(B)
 
@@ -224,24 +154,18 @@ func TestHadamardProduct(t *testing.T) {
 }
 
 func TestT(t *testing.T) {
-	M := &Matrix{
-		rows:    2,
-		columns: 3,
-		arr: [][]float64{
-			{12.0, 0.0, -4.0},
-			{15.0, 6.0, -10.0},
-		},
+	m := [][]float64{
+		{12.0, 0.0, -4.0},
+		{15.0, 6.0, -10.0},
 	}
+	M := dataToMatrix(m)
 
-	expected := &Matrix{
-		rows:    3,
-		columns: 2,
-		arr: [][]float64{
-			{12.0, 15.0},
-			{0.0, 6.0},
-			{-4.0, -10.0},
-		},
+	e := [][]float64{
+		{12.0, 15.0},
+		{0.0, 6.0},
+		{-4.0, -10.0},
 	}
+	expected := dataToMatrix(e)
 
 	result := M.T()
 
@@ -256,16 +180,16 @@ func TestSlice2Matrix(t *testing.T) {
 	columns := 3
 	slc := []float64{12.0, 0.0, -4.0, 15.0, 6.0, -10.0}
 
-	expected := &Matrix{
-		rows:    2,
-		columns: 3,
-		arr: [][]float64{
-			{12.0, 0.0, -4.0},
-			{15.0, 6.0, -10.0},
-		},
+	e := [][]float64{
+		{12.0, 0.0, -4.0},
+		{15.0, 6.0, -10.0},
 	}
+	expected := dataToMatrix(e)
 
-	result := Slice2Matrix(slc, rows, columns)
+	A := Zeros(rows, columns)
+	A.Slice2Matrix(slc)
+
+	result := A
 
 	//проверка на равность
 	if !isMatrixesEqual(result, expected) {
@@ -274,25 +198,19 @@ func TestSlice2Matrix(t *testing.T) {
 }
 
 func TestForEach(t *testing.T) {
-	M := &Matrix{
-		rows:    3,
-		columns: 3,
-		arr: [][]float64{
-			{1.0, 10.0, 6.0},
-			{12.0, 0.0, -4.0},
-			{15.0, 6.0, -10.0},
-		},
+	m := [][]float64{
+		{1.0, 10.0, 6.0},
+		{12.0, 0.0, -4.0},
+		{15.0, 6.0, -10.0},
 	}
+	M := dataToMatrix(m)
 
-	expected := &Matrix{
-		rows:    3,
-		columns: 3,
-		arr: [][]float64{
-			{1.0, 100.0, 36.0},
-			{144.0, 0.0, 16.0},
-			{225.0, 36.0, 100.0},
-		},
+	e := [][]float64{
+		{1.0, 100.0, 36.0},
+		{144.0, 0.0, 16.0},
+		{225.0, 36.0, 100.0},
 	}
+	expected := dataToMatrix(e)
 
 	result := M.ForEach(square)
 

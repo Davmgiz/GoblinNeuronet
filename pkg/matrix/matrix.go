@@ -1,192 +1,112 @@
 package matrix
 
-import (
-	"fmt"
-	"log"
-	"math/rand"
-	"sync"
-	"time"
-)
-
 /*
-Работа происходит только с указателями на матрицы
-Любая функция или любой метод возвращает указатель на матрицу
+Оболочка над реализацией матриц
 */
 
-// структура матрицы
+/*
+Структура должна содержать следующие методы:
+
+GetColumns(),
+GetRows(),
+Dot(B Matrix) Matrix // Умножение матриц
+Add(B Matrix) Matrix // Сложение матриц
+Sub(B Matrix) Matrix // Разность матриц
+HadamardProduct(B Matrix) Matrix // Адамарное произведение матриц
+T() Matrix // Транспонирование матрицы
+ForEach(f func(float64) float64) Matrix // поэлементное применение переданной функции к матрицы
+Slice2Matrix(slc []float64) // заполнение матрицы элементами из слайса
+
+Должны быть определены функции работающие со структурой:
+
+Zeros(rows, columns int) Matrix // возвращает нулевую матрицу данной размерности
+RandMatrix(rows, columns int) Matrix // возвращает матрицу с рандомными элементами
+
+Должны быть определены следующие функции для работы тестов:
+
+dataToMatrix(arr [][]float64) Matrix // из 2д массива делает матрицу
+isMatrixesEqual(A, B Matrix) bool // проверяет на равность матрицы
+countUniqueElements(M Matrix) int // возвращает количество уникальных элементов
+
+*/
 type Matrix struct {
-	columns int         // столбцы
-	rows    int         // строки
-	arr     [][]float64 // 2ух мерный массив
+	matrix *myMatrix
 }
 
-func init() {
-	rand.Seed(time.Now().UnixNano())
-}
-
-// функция создает матрицы с элементами из нормального распределения со средним значением 0 и стандартным отклонением 1
-func RandMatrix(rows, columns int) *Matrix {
-	matrix := Zeros(rows, columns)
-
-	for i := 0; i < rows; i++ {
-		for j := 0; j < columns; j++ {
-			matrix.arr[i][j] = rand.NormFloat64()
-		}
-	}
-
-	return matrix
-}
-
-// функция создает нулевую матрицу данной размерности
-func Zeros(rows, columns int) *Matrix {
-
-	if rows <= 0 || columns <= 0 {
-		log.Fatal("Matrix dimensions must be positive: rows and columns should be greater than 0")
-	}
-
-	arr := make([][]float64, rows)
-	for i := range arr {
-		arr[i] = make([]float64, columns)
-	}
-
-	return &Matrix{
-		columns: columns,
-		rows:    rows,
-		arr:     arr,
+func Zeros(rows, columns int) Matrix {
+	return Matrix{
+		matrix: zeros(rows, columns),
 	}
 }
 
-// функция выводит на экран
-func (M *Matrix) Show() {
-	for _, row := range M.arr {
-		fmt.Println(row)
+func RandMatrix(rows, columns int) Matrix {
+	return Matrix{
+		matrix: randMatrix(rows, columns),
 	}
 }
 
-// произведение матрицы A на B
-func (A *Matrix) Dot(B *Matrix) *Matrix {
-	if A.columns != B.rows {
-		log.Fatal("Incorrect dimension for matrix multiplication")
-	}
-
-	wg := new(sync.WaitGroup)
-	wg.Add(A.rows * B.columns)
-
-	C := Zeros(A.rows, B.columns)
-
-	for i := 0; i < A.rows; i++ {
-		for j := 0; j < B.columns; j++ {
-
-			go func(i, j int) {
-				defer wg.Done()
-
-				sum := float64(0)
-
-				for k := 0; k < A.columns; k++ {
-					sum += A.arr[i][k] * B.arr[k][j]
-				}
-				C.arr[i][j] = sum
-			}(i, j)
-		}
-	}
-
-	wg.Wait()
-
-	return C
-
+func (M Matrix) GetColumns() int {
+	return M.matrix.columns
 }
 
-// функция сложения матриц
-func (A *Matrix) Addition(B *Matrix) *Matrix {
-	if A.rows != B.rows || A.columns != B.columns {
-		log.Fatal("Incorrect dimension for matrix additional")
-	}
-
-	C := Zeros(A.rows, A.columns)
-
-	for i := 0; i < A.rows; i++ {
-		for j := 0; j < A.columns; j++ {
-			C.arr[i][j] = A.arr[i][j] + B.arr[i][j]
-		}
-	}
-
-	return C
+func (M Matrix) GetRows() int {
+	return M.matrix.rows
 }
 
-// функция вычитания матриц
-func (A *Matrix) Sub(B *Matrix) *Matrix {
-	if A.rows != B.rows || A.columns != B.columns {
-		log.Fatal("Incorrect dimension for matrix subtraction")
+func (A Matrix) Dot(B Matrix) Matrix {
+	return Matrix{
+		matrix: A.matrix.dot(B.matrix),
 	}
-
-	C := Zeros(A.rows, A.columns)
-
-	for i := 0; i < A.rows; i++ {
-		for j := 0; j < A.columns; j++ {
-			C.arr[i][j] = A.arr[i][j] - B.arr[i][j]
-		}
-	}
-
-	return C
 }
 
-// адамарное произведение (поэлиментное произведение)
-func (A *Matrix) HadamardProduct(B *Matrix) *Matrix {
-	if A.rows != B.rows || A.columns != B.columns {
-		log.Fatal("Incorrect dimension for matrix Hadamard product")
+func (A Matrix) Add(B Matrix) Matrix {
+	return Matrix{
+		matrix: A.matrix.add(B.matrix),
 	}
-
-	C := Zeros(A.rows, A.columns)
-
-	for i := 0; i < A.rows; i++ {
-		for j := 0; j < A.columns; j++ {
-			C.arr[i][j] = A.arr[i][j] * B.arr[i][j]
-		}
-	}
-
-	return C
 }
 
-// транспонирование матрицы
-func (M *Matrix) T() *Matrix {
-	matrix := Zeros(M.columns, M.rows)
-
-	for i := 0; i < M.rows; i++ {
-		for j := 0; j < M.columns; j++ {
-			matrix.arr[j][i] = M.arr[i][j]
-		}
+func (A Matrix) Sub(B Matrix) Matrix {
+	return Matrix{
+		matrix: A.matrix.sub(B.matrix),
 	}
-
-	return matrix
 }
 
-// делаем из слайса матрицу данной размерности
-func Slice2Matrix(slc []float64, rows, columns int) *Matrix {
-	if rows*columns != len(slc) {
-		log.Fatal("Incorrect dimension of the result matrix or lenght of the slice for creating a matrix from a slice")
+func (A Matrix) HadamardProduct(B Matrix) Matrix {
+	return Matrix{
+		matrix: A.matrix.hadamardProduct(B.matrix),
 	}
-
-	matrix := Zeros(rows, columns)
-
-	ind := 0
-
-	for i := 0; i < rows; i++ {
-		for j := 0; j < columns; j++ {
-			matrix.arr[i][j] = slc[ind]
-			ind++
-		}
-	}
-
-	return matrix
 }
 
-func (M *Matrix) ForEach(f func(float64) float64) *Matrix {
-	matrix := Zeros(M.rows, M.columns)
-
-	for i := 0; i < M.rows; i++ {
-		for j := 0; j < M.columns; j++ {
-			matrix.arr[i][j] = f(M.arr[i][j])
-		}
+func (M Matrix) T() Matrix {
+	return Matrix{
+		matrix: M.matrix.t(),
 	}
-	return matrix
+}
+
+func (M Matrix) ForEach(f func(float64) float64) Matrix {
+	return Matrix{
+		matrix: M.matrix.forEach(f),
+	}
+}
+
+func (M Matrix) Slice2Matrix(slc []float64) {
+	M.matrix.slice2Matrix(slc)
+}
+
+/*
+Функции предназначены для работы тестов
+*/
+
+func dataToMatrix(arr [][]float64) Matrix {
+	return Matrix{
+		matrix: _dataToMatrix(arr),
+	}
+}
+
+func isMatrixesEqual(A, B Matrix) bool {
+	return _isMatrixesEqual(A.matrix, B.matrix)
+}
+
+func countUniqueElements(M Matrix) int {
+	return _countUniqueElements(M.matrix)
 }
