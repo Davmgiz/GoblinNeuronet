@@ -46,11 +46,11 @@ func RandMatrix(rows, columns int) Matrix {
 }
 
 func (M Matrix) GetColumns() int {
-	return M.matrix.columns
+	return M.matrix.getColumns()
 }
 
 func (M Matrix) GetRows() int {
-	return M.matrix.rows
+	return M.matrix.getRows()
 }
 
 func (A Matrix) Dot(B Matrix) Matrix {
