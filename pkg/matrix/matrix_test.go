@@ -57,7 +57,7 @@ func TestDot(t *testing.T) {
 	}
 
 	// проверка на равность
-	if !isMatrixesEqual(result, expected) {
+	if !IsMatrixesEqual(result, expected) {
 		t.Errorf("Matrix multiplication error: Result != Expected")
 	}
 
@@ -88,7 +88,7 @@ func TestAddition(t *testing.T) {
 	result := A.Add(B)
 
 	//проверка на равность
-	if !isMatrixesEqual(result, expected) {
+	if !IsMatrixesEqual(result, expected) {
 		t.Errorf("Matrix additional error: Result != Expected")
 	}
 }
@@ -118,7 +118,7 @@ func TestSub(t *testing.T) {
 	result := A.Sub(B)
 
 	//проверка на равность
-	if !isMatrixesEqual(result, expected) {
+	if !IsMatrixesEqual(result, expected) {
 		t.Errorf("Matrix subtraction error: Result != Expected")
 	}
 }
@@ -148,7 +148,7 @@ func TestHadamardProduct(t *testing.T) {
 	result := A.HadamardProduct(B)
 
 	//проверка на равность
-	if !isMatrixesEqual(result, expected) {
+	if !IsMatrixesEqual(result, expected) {
 		t.Errorf("Matrix Hadamard product error: Result != Expected")
 	}
 }
@@ -170,7 +170,7 @@ func TestT(t *testing.T) {
 	result := M.T()
 
 	//проверка на равность
-	if !isMatrixesEqual(result, expected) {
+	if !IsMatrixesEqual(result, expected) {
 		t.Errorf("Matrix transposition error: Result != Expected")
 	}
 }
@@ -192,7 +192,7 @@ func TestSlice2Matrix(t *testing.T) {
 	result := A
 
 	//проверка на равность
-	if !isMatrixesEqual(result, expected) {
+	if !IsMatrixesEqual(result, expected) {
 		t.Errorf("Slice2Matrix error: Result != Expected")
 	}
 }
@@ -215,7 +215,7 @@ func TestForEach(t *testing.T) {
 	result := M.ForEach(square)
 
 	//проверка на равность
-	if !isMatrixesEqual(result, expected) {
+	if !IsMatrixesEqual(result, expected) {
 		t.Errorf("ForEach error: Result != Expected")
 	}
 }

@@ -1,4 +1,4 @@
-package neuralnetwork
+package neural_network
 
 import (
 	"NN/pkg/matrix"

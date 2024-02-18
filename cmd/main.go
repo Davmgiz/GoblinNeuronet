@@ -1,14 +1,20 @@
 package main
 
-//"NN/pkg/matrix"
+import (
+	"NN/pkg/data_frame"
+	"fmt"
+	"time"
+)
 
+// запуск main.go допустим только из корневой директории проекта
 func main() {
-	/*
-		matrix1 := matrix.RandMatrix(4, 5)
-		matrix2 := matrix.RandMatrix(5, 2)
+	startTime := time.Now()
 
-		m, _ := matrix1.Dot(matrix2)
-		m.Show()
-	*/
+	_, err := data_frame.ReadCSV("data/mnist_train.csv", 60000)
+	if err != nil {
+		fmt.Print(err)
+	}
+	elapsedTime := time.Since(startTime)
+	fmt.Printf("Время выполнения: %s\n", elapsedTime)
 
 }

@@ -1,3 +1,8 @@
+/*
+Реализация собственного пакета для работы с матрицами
+Работа происходит только с указателями на матрицы
+Любая функция или любой метод возвращает указатель на матрицу
+*/
 package matrix
 
 import (
@@ -9,12 +14,6 @@ import (
 	"time"
 )
 
-/*
-Реализация собственного пакета для работы с матрицами
-Работа происходит только с указателями на матрицы
-Любая функция или любой метод возвращает указатель на матрицу
-*/
-
 // структура матрицы
 type myMatrix struct {
 	columns int         // столбцы
@@ -22,6 +21,7 @@ type myMatrix struct {
 	data    [][]float64 // 2ух мерный массив
 }
 
+// инициализация генератора псевдослучайных чисел
 func init() {
 	rand.Seed(time.Now().UnixNano())
 }
@@ -58,10 +58,12 @@ func randMatrix(rows, columns int) *myMatrix {
 	return myMatrix
 }
 
+// геттер строк матрицы
 func (M myMatrix) getRows() int {
 	return M.rows
 }
 
+// геттер столбцов матрицы
 func (M myMatrix) getColumns() int {
 	return M.columns
 }
@@ -226,7 +228,7 @@ func _dataToMatrix(arr [][]float64) *myMatrix {
 func _isMatrixesEqual(A, B *myMatrix) bool {
 
 	// радиус окрестности допущения для вещественных чисел
-	epsilon := 1e-9
+	epsilon := float64(1e-9)
 
 	if A.getRows() != B.getRows() || A.getColumns() != B.getColumns() {
 		return false

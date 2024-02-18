@@ -2,9 +2,7 @@ package matrix
 
 /*
 Оболочка над реализацией матриц
-*/
 
-/*
 Структура должна содержать следующие методы:
 
 GetColumns(),
@@ -91,6 +89,7 @@ func (M Matrix) ForEach(f func(float64) float64) Matrix {
 
 func (M Matrix) Slice2Matrix(slc []float64) {
 	M.matrix.slice2Matrix(slc)
+
 }
 
 /*
@@ -103,10 +102,14 @@ func dataToMatrix(arr [][]float64) Matrix {
 	}
 }
 
-func isMatrixesEqual(A, B Matrix) bool {
+func IsMatrixesEqual(A, B Matrix) bool {
 	return _isMatrixesEqual(A.matrix, B.matrix)
 }
 
 func countUniqueElements(M Matrix) int {
 	return _countUniqueElements(M.matrix)
+}
+
+func (M *Matrix) Show() {
+	M.matrix.show()
 }
