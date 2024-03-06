@@ -6,6 +6,7 @@
 package matrix
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"math"
@@ -27,10 +28,11 @@ func init() {
 }
 
 // функция создает нулевую матрицу данной размерности
-func zeros(rows, columns int) *myMatrix {
+func zero(rows, columns int) *myMatrix {
 
 	if rows <= 0 || columns <= 0 {
 		log.Fatal("myMatrix dimensions must be positive: rows and columns should be greater than 0")
+		//panic("myMatrix dimensions must be positive: rows and columns should be greater than 0")
 	}
 
 	data := make([][]float64, rows)
@@ -47,11 +49,11 @@ func zeros(rows, columns int) *myMatrix {
 
 // функция создает матрицы с элементами из нормального распределения со средним значением 0 и стандартным отклонением 1
 func randMatrix(rows, columns int) *myMatrix {
-	myMatrix := zeros(rows, columns)
+	myMatrix := zero(rows, columns)
 
 	for i := 0; i < rows; i++ {
 		for j := 0; j < columns; j++ {
-			myMatrix.data[i][j] = rand.NormFloat64()
+			myMatrix.data[i][j] = rand.NormFloat64() * 0.01
 		}
 	}
 
@@ -84,7 +86,7 @@ func (A *myMatrix) dot(B *myMatrix) *myMatrix {
 	wg := new(sync.WaitGroup)
 	wg.Add(A.getRows() * B.getColumns())
 
-	C := zeros(A.getRows(), B.getColumns())
+	C := zero(A.getRows(), B.getColumns())
 
 	for i := 0; i < A.getRows(); i++ {
 		for j := 0; j < B.getColumns(); j++ {
@@ -114,13 +116,22 @@ func (A *myMatrix) add(B *myMatrix) *myMatrix {
 		log.Fatal("Incorrect dimension for myMatrix additional")
 	}
 
-	C := zeros(A.getRows(), A.getColumns())
+	C := zero(A.getRows(), A.getColumns())
 
+	wg := new(sync.WaitGroup)
+	wg.Add(A.getRows())
 	for i := 0; i < A.getRows(); i++ {
-		for j := 0; j < A.getColumns(); j++ {
-			C.data[i][j] = A.data[i][j] + B.data[i][j]
-		}
+
+		go func(i int) {
+			defer wg.Done()
+			for j := 0; j < A.getColumns(); j++ {
+				C.data[i][j] = A.data[i][j] + B.data[i][j]
+			}
+
+		}(i)
 	}
+
+	wg.Wait()
 
 	return C
 }
@@ -131,13 +142,23 @@ func (A *myMatrix) sub(B *myMatrix) *myMatrix {
 		log.Fatal("Incorrect dimension for myMatrix subtraction")
 	}
 
-	C := zeros(A.getRows(), A.getColumns())
+	C := zero(A.getRows(), A.getColumns())
+
+	wg := new(sync.WaitGroup)
+	wg.Add(A.getRows())
 
 	for i := 0; i < A.getRows(); i++ {
-		for j := 0; j < A.getColumns(); j++ {
-			C.data[i][j] = A.data[i][j] - B.data[i][j]
-		}
+
+		go func(i int) {
+			defer wg.Done()
+
+			for j := 0; j < A.getColumns(); j++ {
+				C.data[i][j] = A.data[i][j] - B.data[i][j]
+			}
+		}(i)
+
 	}
+	wg.Wait()
 
 	return C
 }
@@ -148,40 +169,90 @@ func (A *myMatrix) hadamardProduct(B *myMatrix) *myMatrix {
 		log.Fatal("Incorrect dimension for myMatrix Hadamard product")
 	}
 
-	C := zeros(A.getRows(), A.getColumns())
+	C := zero(A.getRows(), A.getColumns())
+
+	wg := new(sync.WaitGroup)
+	wg.Add(A.getRows())
 
 	for i := 0; i < A.getRows(); i++ {
-		for j := 0; j < A.getColumns(); j++ {
-			C.data[i][j] = A.data[i][j] * B.data[i][j]
-		}
+
+		go func(i int) {
+			defer wg.Done()
+
+			for j := 0; j < A.getColumns(); j++ {
+				C.data[i][j] = A.data[i][j] * B.data[i][j]
+			}
+		}(i)
+
 	}
+	wg.Wait()
 
 	return C
 }
 
 // транспонирование матрицы
 func (M *myMatrix) t() *myMatrix {
-	myMatrix := zeros(M.getColumns(), M.getRows())
+	myMatrix := zero(M.getColumns(), M.getRows())
+
+	wg := new(sync.WaitGroup)
+	wg.Add(M.getRows())
 
 	for i := 0; i < M.getRows(); i++ {
-		for j := 0; j < M.getColumns(); j++ {
-			myMatrix.data[j][i] = M.data[i][j]
-		}
+
+		go func(i int) {
+			defer wg.Done()
+
+			for j := 0; j < M.getColumns(); j++ {
+				myMatrix.data[j][i] = M.data[i][j]
+			}
+		}(i)
+
 	}
+
+	wg.Wait()
 
 	return myMatrix
 }
 
 // функция принимает функцию и применяет ее для каждого элемента матрицы
 func (M *myMatrix) forEach(f func(float64) float64) *myMatrix {
-	myMatrix := zeros(M.getRows(), M.getColumns())
+	myMatrix := zero(M.getRows(), M.getColumns())
+
+	wg := new(sync.WaitGroup)
+	wg.Add(M.getRows())
 
 	for i := 0; i < M.getRows(); i++ {
-		for j := 0; j < M.getColumns(); j++ {
-			myMatrix.data[i][j] = f(M.data[i][j])
-		}
+
+		go func(i int) {
+			defer wg.Done()
+
+			for j := 0; j < M.getColumns(); j++ {
+				myMatrix.data[i][j] = f(M.data[i][j])
+			}
+		}(i)
+
 	}
+	wg.Wait()
+
 	return myMatrix
+}
+
+func (M *myMatrix) forEachInner(f func(float64) float64) {
+	wg := new(sync.WaitGroup)
+	wg.Add(M.getRows())
+
+	for i := 0; i < M.getRows(); i++ {
+
+		go func(i int) {
+			defer wg.Done()
+
+			for j := 0; j < M.getColumns(); j++ {
+				M.data[i][j] = f(M.data[i][j])
+			}
+		}(i)
+
+	}
+	wg.Wait()
 }
 
 // заполняем матрицу числами из слайса
@@ -190,15 +261,84 @@ func (M *myMatrix) slice2Matrix(slc []float64) {
 		log.Fatal("Incorrect dimension of the result myMatrix or lenght of the slice for creating a myMatrix from a slice")
 	}
 
-	ind := 0
+	wg := new(sync.WaitGroup)
+	wg.Add(M.getRows())
 
 	for i := 0; i < M.getRows(); i++ {
-		for j := 0; j < M.getColumns(); j++ {
-			M.data[i][j] = slc[ind]
-			ind++
-		}
+
+		go func(i int) {
+			defer wg.Done()
+
+			for j := 0; j < M.getColumns(); j++ {
+				M.data[i][j] = slc[i*M.columns+j]
+			}
+		}(i)
+
 	}
 
+	wg.Wait()
+
+}
+
+func (M *myMatrix) num() float64 {
+	if M.getColumns() != 1 && M.getRows() != 1 {
+		log.Fatal("Matrix dimension  must be 1*1")
+	}
+	return M.data[0][0]
+}
+
+func float64ToInt(x float64) (int, error) {
+	xF := int(x)
+	if math.Abs(float64(xF)-x) > 1e-9 {
+		return -1, errors.New("incorrect matrix value for converting to int")
+	}
+	return xF, nil
+}
+
+func dig2Vec(x float64, n int) (*myMatrix, error) {
+	xI, err := float64ToInt(x)
+	if err != nil {
+		return &myMatrix{}, err
+	}
+	if xI > n || xI < 0 {
+		return &myMatrix{}, fmt.Errorf("digit must be [%v, %v]", 0, n)
+	}
+
+	res := zero(n, 1)
+	res.data[xI][0] = 1.
+
+	return res, nil
+
+}
+
+func matrix2Vector(M *myMatrix, n int) (*myMatrix, error) {
+	digF := M.num()
+	res, err := dig2Vec(digF, n)
+	if err != nil {
+		return &myMatrix{}, err
+	}
+	return res, nil
+
+}
+
+func vec2Dig(M *myMatrix) int {
+	if M.getColumns() != 1 {
+		log.Fatal("Incorrect dimension of matrix for converting to digit")
+	}
+	if M.getRows() <= 1 {
+		log.Fatal("Incorrect vector")
+	}
+
+	max := M.data[0][0]
+	ind := 0
+
+	for i := 1; i < M.getRows(); i++ {
+		if M.data[i][0] > max {
+			ind = i
+			max = M.data[i][0]
+		}
+	}
+	return ind
 }
 
 /*

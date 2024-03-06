@@ -1,6 +1,7 @@
 package matrix
 
 import (
+	"math"
 	"testing"
 )
 
@@ -34,20 +35,20 @@ func TestDot(t *testing.T) {
 		{3., 4.},
 		{5., 6.},
 	}
-	A := dataToMatrix(a)
+	A := DataToMatrix(a)
 
 	b := [][]float64{
 		{1., 2., 3., 10.},
 		{4., 5., 6., 9.},
 	}
-	B := dataToMatrix(b)
+	B := DataToMatrix(b)
 
 	e := [][]float64{
 		{9., 12., 15., 28.},
 		{19., 26., 33., 66.},
 		{29., 40., 51., 104.},
 	}
-	expected := dataToMatrix(e)
+	expected := DataToMatrix(e)
 
 	result := A.Dot(B)
 
@@ -69,21 +70,21 @@ func TestAddition(t *testing.T) {
 		{4.0, 5.0, 6.0},
 		{7.0, 8.0, 9.0},
 	}
-	A := dataToMatrix(a)
+	A := DataToMatrix(a)
 
 	b := [][]float64{
 		{9.0, 8.0, 7.0},
 		{6.0, 5.0, 4.0},
 		{3.0, 2.0, 1.0},
 	}
-	B := dataToMatrix(b)
+	B := DataToMatrix(b)
 
 	e := [][]float64{
 		{10.0, 10.0, 10.0},
 		{10.0, 10.0, 10.0},
 		{10.0, 10.0, 10.0},
 	}
-	expected := dataToMatrix(e)
+	expected := DataToMatrix(e)
 
 	result := A.Add(B)
 
@@ -99,21 +100,21 @@ func TestSub(t *testing.T) {
 		{4.0, 5.0, 6.0},
 		{7.0, 8.0, 9.0},
 	}
-	A := dataToMatrix(a)
+	A := DataToMatrix(a)
 
 	b := [][]float64{
 		{9.0, 8.0, 7.0},
 		{6.0, 5.0, 4.0},
 		{3.0, 2.0, 1.0},
 	}
-	B := dataToMatrix(b)
+	B := DataToMatrix(b)
 
 	e := [][]float64{
 		{-8.0, -6.0, -4.0},
 		{-2.0, 0.0, 2.0},
 		{4.0, 6.0, 8.0},
 	}
-	expected := dataToMatrix(e)
+	expected := DataToMatrix(e)
 
 	result := A.Sub(B)
 
@@ -129,21 +130,21 @@ func TestHadamardProduct(t *testing.T) {
 		{-4.0, 0.0, 1.0},
 		{5.0, 3.0, -10.0},
 	}
-	A := dataToMatrix(a)
+	A := DataToMatrix(a)
 
 	b := [][]float64{
 		{1.0, 5.0, 3.0},
 		{-3.0, 5.0, -4.0},
 		{3.0, 2.0, 1.0},
 	}
-	B := dataToMatrix(b)
+	B := DataToMatrix(b)
 
 	e := [][]float64{
 		{1.0, 10.0, 6.0},
 		{12.0, 0.0, -4.0},
 		{15.0, 6.0, -10.0},
 	}
-	expected := dataToMatrix(e)
+	expected := DataToMatrix(e)
 
 	result := A.HadamardProduct(B)
 
@@ -158,14 +159,14 @@ func TestT(t *testing.T) {
 		{12.0, 0.0, -4.0},
 		{15.0, 6.0, -10.0},
 	}
-	M := dataToMatrix(m)
+	M := DataToMatrix(m)
 
 	e := [][]float64{
 		{12.0, 15.0},
 		{0.0, 6.0},
 		{-4.0, -10.0},
 	}
-	expected := dataToMatrix(e)
+	expected := DataToMatrix(e)
 
 	result := M.T()
 
@@ -184,9 +185,9 @@ func TestSlice2Matrix(t *testing.T) {
 		{12.0, 0.0, -4.0},
 		{15.0, 6.0, -10.0},
 	}
-	expected := dataToMatrix(e)
+	expected := DataToMatrix(e)
 
-	A := Zeros(rows, columns)
+	A := Zero(rows, columns)
 	A.Slice2Matrix(slc)
 
 	result := A
@@ -203,14 +204,14 @@ func TestForEach(t *testing.T) {
 		{12.0, 0.0, -4.0},
 		{15.0, 6.0, -10.0},
 	}
-	M := dataToMatrix(m)
+	M := DataToMatrix(m)
 
 	e := [][]float64{
 		{1.0, 100.0, 36.0},
 		{144.0, 0.0, 16.0},
 		{225.0, 36.0, 100.0},
 	}
-	expected := dataToMatrix(e)
+	expected := DataToMatrix(e)
 
 	result := M.ForEach(square)
 
@@ -220,6 +221,73 @@ func TestForEach(t *testing.T) {
 	}
 }
 
+func TestForEachInner(t *testing.T) {
+	r := [][]float64{
+		{1.0, 10.0, 6.0},
+		{12.0, 0.0, -4.0},
+		{15.0, 6.0, -10.0},
+	}
+	result := DataToMatrix(r)
+
+	e := [][]float64{
+		{1.0, 100.0, 36.0},
+		{144.0, 0.0, 16.0},
+		{225.0, 36.0, 100.0},
+	}
+	expected := DataToMatrix(e)
+
+	result.ForEachInner(square)
+
+	//проверка на равность
+	if !IsMatrixesEqual(result, expected) {
+		t.Errorf("ForEachInner error: Result != Expected")
+	}
+}
+
 func square(x float64) float64 {
 	return x * x
+}
+
+func TestMatrix2Vector(t *testing.T) {
+	m := [][]float64{{5.}}
+	M := DataToMatrix(m)
+
+	result, err := Matrix2Vector(M, 10)
+	if err != nil {
+		t.Error(err)
+	}
+
+	e := [][]float64{{0.}, {0.}, {0.}, {0.}, {0.}, {1.}, {0.}, {0.}, {0.}, {0.}}
+	expected := DataToMatrix(e)
+
+	if !IsMatrixesEqual(result, expected) {
+		t.Errorf("Incorrect converting matrix to vector")
+	}
+}
+
+func TestNum(t *testing.T) {
+	m := [][]float64{{5.}}
+	M := DataToMatrix(m)
+
+	result := Num(M)
+
+	expected := 5.
+
+	if math.Abs(result-expected) > 1e-9 {
+		t.Errorf("Incorrect converting matrix to float64")
+	}
+
+}
+
+func TestVec2Dig(t *testing.T) {
+	m := [][]float64{{0.33333}, {0.122345}, {0.0000001}, {0.0030003}, {7.65764756}, {10.8478374}, {0.06565}, {0.111}, {0.1212}, {0.89}}
+	M := DataToMatrix(m)
+	result := Vec2Dig(M)
+
+	expected := 5
+
+	if result != expected {
+		t.Errorf("Incorrect converting vector to digit")
+	}
+
 }

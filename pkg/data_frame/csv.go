@@ -60,25 +60,30 @@ func ReadCSV(filename string, capacity int) (DataFrame, error) {
 		// CSV файлы содержат данные одного наблюдения в самой первой ячейке
 		recordDataString := strings.Split(record[0], sep)
 
-		lenRecord := len(recordDataString)
+		minLenRecord = min(minLenRecord, len(recordDataString))
+		maxLenRecord = max(maxLenRecord, len(recordDataString))
 
-		minLenRecord = min(minLenRecord, lenRecord)
-		maxLenRecord = max(maxLenRecord, lenRecord)
-
-		recordDataFloat64 := make([]float64, lenRecord)
+		recordDataFloat64 := make([]float64, len(recordDataString))
 
 		// преобразуем элементы массива recordDataString типа string элементы массива recordDataFloat64 типа float64
-		for i := 0; i < lenRecord; i++ {
+		for i := 0; i < len(recordDataString); i++ {
 			num, err := strconv.ParseFloat(recordDataString[i], 64)
 			if err != nil {
 				return DataFrame{}, fmt.Errorf("incorrect csv file format: %v", err)
 			}
-			recordDataFloat64[i] = num
+			if i == 0 {
+				recordDataFloat64[i] = num
+			} else {
+				recordDataFloat64[i] = num / 255.
+			}
+			//recordDataFloat64[i] = num / 255.
 		}
 
 		// добавляем в новую строку датафрейма целевую переменную и признаки
-		y := recordDataFloat64[0]
-		x := matrix.Zeros(len(recordDataFloat64)-1, 1)
+		//y := recordDataFloat64[0]
+		y := matrix.Zero(1, 1)
+		y.Slice2Matrix([]float64{recordDataFloat64[0]})
+		x := matrix.Zero(len(recordDataFloat64)-1, 1)
 		x.Slice2Matrix(recordDataFloat64[1:])
 
 		rowDf := &rowDataFrame{

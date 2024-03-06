@@ -31,9 +31,9 @@ type Matrix struct {
 	matrix *myMatrix
 }
 
-func Zeros(rows, columns int) Matrix {
+func Zero(rows, columns int) Matrix {
 	return Matrix{
-		matrix: zeros(rows, columns),
+		matrix: zero(rows, columns),
 	}
 }
 
@@ -87,16 +87,39 @@ func (M Matrix) ForEach(f func(float64) float64) Matrix {
 	}
 }
 
+func (M Matrix) ForEachInner(f func(float64) float64) {
+	M.matrix.forEachInner(f)
+}
+
 func (M Matrix) Slice2Matrix(slc []float64) {
 	M.matrix.slice2Matrix(slc)
 
+}
+
+func Matrix2Vector(M Matrix, n int) (Matrix, error) {
+	myMatr, err := matrix2Vector(M.matrix, n)
+	if err != nil {
+		return Matrix{}, err
+	}
+
+	return Matrix{
+		matrix: myMatr,
+	}, nil
+}
+
+func Vec2Dig(M Matrix) int {
+	return vec2Dig(M.matrix)
+}
+
+func Num(M Matrix) float64 {
+	return M.matrix.num()
 }
 
 /*
 Функции предназначены для работы тестов
 */
 
-func dataToMatrix(arr [][]float64) Matrix {
+func DataToMatrix(arr [][]float64) Matrix {
 	return Matrix{
 		matrix: _dataToMatrix(arr),
 	}
@@ -110,6 +133,6 @@ func countUniqueElements(M Matrix) int {
 	return _countUniqueElements(M.matrix)
 }
 
-func (M *Matrix) Show() {
+func (M Matrix) Show() {
 	M.matrix.show()
 }
