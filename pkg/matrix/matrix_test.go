@@ -64,7 +64,7 @@ func TestDot(t *testing.T) {
 
 }
 
-func TestAddition(t *testing.T) {
+func TestAdd(t *testing.T) {
 	a := [][]float64{
 		{1.0, 2.0, 3.0},
 		{4.0, 5.0, 6.0},
@@ -87,6 +87,36 @@ func TestAddition(t *testing.T) {
 	expected := DataToMatrix(e)
 
 	result := A.Add(B)
+
+	//проверка на равность
+	if !IsMatrixesEqual(result, expected) {
+		t.Errorf("Matrix additional error: Result != Expected")
+	}
+}
+
+func TestAddInner(t *testing.T) {
+	r := [][]float64{
+		{1.0, 2.0, 3.0},
+		{4.0, 5.0, 6.0},
+		{7.0, 8.0, 9.0},
+	}
+	result := DataToMatrix(r)
+
+	b := [][]float64{
+		{9.0, 8.0, 7.0},
+		{6.0, 5.0, 4.0},
+		{3.0, 2.0, 1.0},
+	}
+	B := DataToMatrix(b)
+
+	e := [][]float64{
+		{10.0, 10.0, 10.0},
+		{10.0, 10.0, 10.0},
+		{10.0, 10.0, 10.0},
+	}
+	expected := DataToMatrix(e)
+
+	result.AddSelf(B)
 
 	//проверка на равность
 	if !IsMatrixesEqual(result, expected) {
@@ -124,6 +154,36 @@ func TestSub(t *testing.T) {
 	}
 }
 
+func TestSubInner(t *testing.T) {
+	r := [][]float64{
+		{1.0, 2.0, 3.0},
+		{4.0, 5.0, 6.0},
+		{7.0, 8.0, 9.0},
+	}
+	result := DataToMatrix(r)
+
+	b := [][]float64{
+		{9.0, 8.0, 7.0},
+		{6.0, 5.0, 4.0},
+		{3.0, 2.0, 1.0},
+	}
+	B := DataToMatrix(b)
+
+	e := [][]float64{
+		{-8.0, -6.0, -4.0},
+		{-2.0, 0.0, 2.0},
+		{4.0, 6.0, 8.0},
+	}
+	expected := DataToMatrix(e)
+
+	result.SubSelf(B)
+
+	//проверка на равность
+	if !IsMatrixesEqual(result, expected) {
+		t.Errorf("Matrix subtraction error: Result != Expected")
+	}
+}
+
 func TestHadamardProduct(t *testing.T) {
 	a := [][]float64{
 		{1.0, 2.0, 2.0},
@@ -147,6 +207,36 @@ func TestHadamardProduct(t *testing.T) {
 	expected := DataToMatrix(e)
 
 	result := A.HadamardProduct(B)
+
+	//проверка на равность
+	if !IsMatrixesEqual(result, expected) {
+		t.Errorf("Matrix Hadamard product error: Result != Expected")
+	}
+}
+
+func TestHadamardProductInner(t *testing.T) {
+	r := [][]float64{
+		{1.0, 2.0, 2.0},
+		{-4.0, 0.0, 1.0},
+		{5.0, 3.0, -10.0},
+	}
+	result := DataToMatrix(r)
+
+	b := [][]float64{
+		{1.0, 5.0, 3.0},
+		{-3.0, 5.0, -4.0},
+		{3.0, 2.0, 1.0},
+	}
+	B := DataToMatrix(b)
+
+	e := [][]float64{
+		{1.0, 10.0, 6.0},
+		{12.0, 0.0, -4.0},
+		{15.0, 6.0, -10.0},
+	}
+	expected := DataToMatrix(e)
+
+	result.HadamardProductSelf(B)
 
 	//проверка на равность
 	if !IsMatrixesEqual(result, expected) {
@@ -236,7 +326,7 @@ func TestForEachInner(t *testing.T) {
 	}
 	expected := DataToMatrix(e)
 
-	result.ForEachInner(square)
+	result.ForEachSelf(square)
 
 	//проверка на равность
 	if !IsMatrixesEqual(result, expected) {

@@ -71,16 +71,28 @@ func (A Matrix) Add(B Matrix) Matrix {
 	}
 }
 
+func (A Matrix) AddSelf(B Matrix) {
+	A.matrix.addSelf(B.matrix)
+}
+
 func (A Matrix) Sub(B Matrix) Matrix {
 	return Matrix{
 		matrix: A.matrix.sub(B.matrix),
 	}
 }
 
+func (A Matrix) SubSelf(B Matrix) {
+	A.matrix.subSelf(B.matrix)
+}
+
 func (A Matrix) HadamardProduct(B Matrix) Matrix {
 	return Matrix{
 		matrix: A.matrix.hadamardProduct(B.matrix),
 	}
+}
+
+func (A Matrix) HadamardProductSelf(B Matrix) {
+	A.matrix.hadamardProductSelf(B.matrix)
 }
 
 func (M Matrix) T() Matrix {
@@ -95,8 +107,8 @@ func (M Matrix) ForEach(f func(float64) float64) Matrix {
 	}
 }
 
-func (M Matrix) ForEachInner(f func(float64) float64) {
-	M.matrix.forEachInner(f)
+func (M Matrix) ForEachSelf(f func(float64) float64) {
+	M.matrix.forEachSelf(f)
 }
 
 func (M Matrix) Slice2Matrix(slc []float64) {
@@ -134,7 +146,7 @@ func DataToMatrix(arr [][]float64) Matrix {
 }
 
 func IsMatrixesEqual(A, B Matrix) bool {
-	return _isMatrixesEqual(A.matrix, B.matrix)
+	return isMatrixesEqual(A.matrix, B.matrix)
 }
 
 func countUniqueElements(M Matrix) int {

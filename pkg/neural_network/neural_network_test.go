@@ -7,36 +7,36 @@ import (
 )
 
 func TestSvg(t *testing.T) {
-	var w11 = matrix.DataToMatrix([][]float64{
+	var w1 = matrix.DataToMatrix([][]float64{
 		{1., 2., 3., 4.},
 		{6., 7., 8., 9.},
 		{10., 11., 12., 13.},
 	})
 
-	var w22 = matrix.DataToMatrix([][]float64{
+	var w2 = matrix.DataToMatrix([][]float64{
 		{1., 2., 3.},
 		{4., 5., 6.},
 	})
 
-	var weights1 = []matrix.Matrix{w11, w22}
+	var weights = []matrix.Matrix{w1, w2}
 
-	var b11 = matrix.DataToMatrix([][]float64{
+	var b1 = matrix.DataToMatrix([][]float64{
 		{1.},
 		{2.},
 		{3.},
 	})
 
-	var b22 = matrix.DataToMatrix([][]float64{
+	var b2 = matrix.DataToMatrix([][]float64{
 		{4.},
 		{5.},
 	})
 
-	var biases1 = []matrix.Matrix{b11, b22}
+	var biases = []matrix.Matrix{b1, b2}
 
 	nn := NewNeuralNetwork([]int{4, 3, 2})
 
-	nn.weights = weights1
-	nn.biases = biases1
+	nn.weights = weights
+	nn.biases = biases
 
 	dfTrain, err := data_frame.ReadCSV("../../data/neural_network_test/test_svg_data_train.csv", 10)
 	if err != nil {
@@ -87,4 +87,66 @@ func TestSvg(t *testing.T) {
 		}
 	}
 
+}
+
+func TestFeedForward(t *testing.T) {
+	var w1 = matrix.DataToMatrix([][]float64{
+		{0.001, 0.002, 0.003, 0.004},
+		{0.006, 0.007, 0.008, 0.009},
+		{0.001, 0.0011, 0.0012, 0.0013},
+	})
+
+	var w2 = matrix.DataToMatrix([][]float64{
+		{0.001, 0.002, 0.003},
+		{0.004, 0.005, 0.006},
+	})
+
+	var weights = []matrix.Matrix{w1, w2}
+
+	var b1 = matrix.DataToMatrix([][]float64{
+		{0.001},
+		{0.002},
+		{0.003},
+	})
+
+	var b2 = matrix.DataToMatrix([][]float64{
+		{0.004},
+		{0.005},
+	})
+
+	var biases = []matrix.Matrix{b1, b2}
+
+	nn := NewNeuralNetwork([]int{4, 3, 2})
+
+	nn.weights = weights
+	nn.biases = biases
+
+	x := matrix.DataToMatrix([][]float64{
+		{0.},
+		{1.},
+		{2.},
+		{3.},
+	})
+
+	result := nn.feedforward(x)
+
+	expected := matrix.DataToMatrix([][]float64{
+		{0.50175975},
+		{0.50315035},
+	})
+
+	if !matrix.IsMatrixesEqual(result, expected) {
+		t.Errorf("Dont equal expected and result")
+	}
+
+	xResult := matrix.DataToMatrix([][]float64{
+		{0.},
+		{1.},
+		{2.},
+		{3.},
+	})
+
+	if !matrix.IsMatrixesEqual(xResult, x) {
+		t.Errorf("It is forbidden to change original matrix")
+	}
 }

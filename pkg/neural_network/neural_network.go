@@ -46,7 +46,10 @@ func (nn NeuralNetwork) feedforward(x matrix.Matrix) matrix.Matrix {
 	for i := 0; i < nn.numLayers-1; i++ {
 
 		// z = sigmoid(w * a + b)
-		x = nn.weights[i].Dot(x).Add(nn.biases[i]).ForEach(sigmoid)
+		x = nn.weights[i].Dot(x)
+		x.AddSelf(nn.biases[i])
+		x.ForEachSelf(sigmoid)
+
 	}
 
 	return x
@@ -85,11 +88,13 @@ func (nn *NeuralNetwork) updateMiniBatch(miniBatch data_frame.DataFrame, eta flo
 		deltaNablaBiases, deltaNablaWeights := nn.backProp(miniBatch.GetRow(i))
 
 		for j := 0; j < len(*nablaWeights); j++ {
-			(*nablaWeights)[j] = (*nablaWeights)[j].Add((*deltaNablaWeights)[j])
+			//(*nablaWeights)[j] = (*nablaWeights)[j].Add((*deltaNablaWeights)[j])
+			(*nablaWeights)[j].AddSelf((*deltaNablaWeights)[j])
 		}
 
 		for j := 0; j < len(*nablaBiases); j++ {
-			(*nablaBiases)[j] = (*nablaBiases)[j].Add((*deltaNablaBiases)[j])
+			//(*nablaBiases)[j] = (*nablaBiases)[j].Add((*deltaNablaBiases)[j])
+			(*nablaBiases)[j].AddSelf((*deltaNablaBiases)[j])
 		}
 
 	}
@@ -98,23 +103,25 @@ func (nn *NeuralNetwork) updateMiniBatch(miniBatch data_frame.DataFrame, eta flo
 	wk := 1. - eta*(lmd/float64(lenDf))
 
 	for j := 0; j < len(nn.weights); j++ {
-		nn.weights[j].ForEachInner(func(w float64) float64 {
+		nn.weights[j].ForEachSelf(func(w float64) float64 {
 			return w * wk
 		})
 
-		(*nablaWeights)[j].ForEachInner(func(w float64) float64 {
+		(*nablaWeights)[j].ForEachSelf(func(w float64) float64 {
 			return w * k
 		})
 
-		nn.weights[j] = nn.weights[j].Sub((*nablaWeights)[j])
+		//nn.weights[j] = nn.weights[j].Sub((*nablaWeights)[j])
+		nn.weights[j].SubSelf((*nablaWeights)[j])
 	}
 
 	for j := 0; j < len(nn.biases); j++ {
-		(*nablaBiases)[j].ForEachInner(func(w float64) float64 {
+		(*nablaBiases)[j].ForEachSelf(func(w float64) float64 {
 			return w * k
 		})
 
-		nn.biases[j] = nn.biases[j].Sub((*nablaBiases)[j])
+		//nn.biases[j] = nn.biases[j].Sub((*nablaBiases)[j])
+		nn.biases[j].SubSelf((*nablaBiases)[j])
 	}
 
 }
@@ -129,20 +136,24 @@ func (nn *NeuralNetwork) backProp(x matrix.Matrix, y matrix.Matrix) (*[]matrix.M
 
 	activation := x
 
-	activations := make([]matrix.Matrix, 0, nn.numLayers)
-	activations = append(activations, activation)
+	activations := make([]matrix.Matrix, nn.numLayers)
+	activations[0] = activation
 
-	zs := make([]matrix.Matrix, 0, nn.numLayers-1)
+	zs := make([]matrix.Matrix, nn.numLayers-1)
 
 	for i := 0; i < nn.numLayers-1; i++ {
 
-		z := nn.weights[i].Dot(activation).Add(nn.biases[i])
+		//z := nn.weights[i].Dot(activation).Add(nn.biases[i])
+		z := nn.weights[i].Dot(activation)
+		z.AddSelf(nn.biases[i])
 
-		zs = append(zs, z)
+		//zs = append(zs, z)
+		zs[i] = z
 
 		activation = z.ForEach(sigmoid)
 
-		activations = append(activations, activation)
+		//activations = append(activations, activation)
+		activations[i+1] = activation
 
 	}
 
@@ -156,7 +167,9 @@ func (nn *NeuralNetwork) backProp(x matrix.Matrix, y matrix.Matrix) (*[]matrix.M
 
 		z := zs[len(zs)-i]
 
-		delta = nn.weights[len(nn.weights)-i+1].T().Dot(delta).HadamardProduct(z.ForEach(sigmoidPrime))
+		//delta = nn.weights[len(nn.weights)-i+1].T().Dot(delta).HadamardProduct(z.ForEach(sigmoidPrime))
+		delta = nn.weights[len(nn.weights)-i+1].T().Dot(delta)
+		delta.HadamardProductSelf(z.ForEach(sigmoidPrime))
 
 		(*nablaBiases)[len(*nablaBiases)-i] = delta
 

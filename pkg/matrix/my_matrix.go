@@ -144,6 +144,27 @@ func (A *myMatrix) add(B *myMatrix) *myMatrix {
 	return C
 }
 
+func (A *myMatrix) addSelf(B *myMatrix) {
+	if A.getRows() != B.getRows() || A.getColumns() != B.getColumns() {
+		log.Fatal("Incorrect dimension for myMatrix additional")
+	}
+
+	wg := new(sync.WaitGroup)
+	wg.Add(A.getRows())
+	for i := 0; i < A.getRows(); i++ {
+
+		go func(i int) {
+			defer wg.Done()
+			for j := 0; j < A.getColumns(); j++ {
+				A.data[i][j] = A.data[i][j] + B.data[i][j]
+			}
+
+		}(i)
+	}
+
+	wg.Wait()
+}
+
 // функция вычитания матриц
 func (A *myMatrix) sub(B *myMatrix) *myMatrix {
 	if A.getRows() != B.getRows() || A.getColumns() != B.getColumns() {
@@ -171,6 +192,28 @@ func (A *myMatrix) sub(B *myMatrix) *myMatrix {
 	return C
 }
 
+func (A *myMatrix) subSelf(B *myMatrix) {
+	if A.getRows() != B.getRows() || A.getColumns() != B.getColumns() {
+		log.Fatal("Incorrect dimension for myMatrix subtraction")
+	}
+
+	wg := new(sync.WaitGroup)
+	wg.Add(A.getRows())
+
+	for i := 0; i < A.getRows(); i++ {
+
+		go func(i int) {
+			defer wg.Done()
+
+			for j := 0; j < A.getColumns(); j++ {
+				A.data[i][j] = A.data[i][j] - B.data[i][j]
+			}
+		}(i)
+
+	}
+	wg.Wait()
+}
+
 // адамарное произведение (поэлементное произведение)
 func (A *myMatrix) hadamardProduct(B *myMatrix) *myMatrix {
 	if A.getRows() != B.getRows() || A.getColumns() != B.getColumns() {
@@ -196,6 +239,28 @@ func (A *myMatrix) hadamardProduct(B *myMatrix) *myMatrix {
 	wg.Wait()
 
 	return C
+}
+
+func (A *myMatrix) hadamardProductSelf(B *myMatrix) {
+	if A.getRows() != B.getRows() || A.getColumns() != B.getColumns() {
+		log.Fatal("Incorrect dimension for myMatrix Hadamard product")
+	}
+
+	wg := new(sync.WaitGroup)
+	wg.Add(A.getRows())
+
+	for i := 0; i < A.getRows(); i++ {
+
+		go func(i int) {
+			defer wg.Done()
+
+			for j := 0; j < A.getColumns(); j++ {
+				A.data[i][j] = A.data[i][j] * B.data[i][j]
+			}
+		}(i)
+
+	}
+	wg.Wait()
 }
 
 // транспонирование матрицы
@@ -245,7 +310,7 @@ func (M *myMatrix) forEach(f func(float64) float64) *myMatrix {
 	return myMatrix
 }
 
-func (M *myMatrix) forEachInner(f func(float64) float64) {
+func (M *myMatrix) forEachSelf(f func(float64) float64) {
 	wg := new(sync.WaitGroup)
 	wg.Add(M.getRows())
 
@@ -373,10 +438,10 @@ func _dataToMatrix(arr [][]float64) *myMatrix {
 }
 
 // проверка на равенство матриц
-func _isMatrixesEqual(A, B *myMatrix) bool {
+func isMatrixesEqual(A, B *myMatrix) bool {
 
 	// радиус окрестности допущения для вещественных чисел
-	epsilon := float64(1e-9)
+	epsilon := float64(1e-6)
 
 	if A.getRows() != B.getRows() || A.getColumns() != B.getColumns() {
 		return false

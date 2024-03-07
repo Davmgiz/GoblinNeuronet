@@ -26,6 +26,9 @@ func main() {
 
 	dfTrain.Num2Vec(10)
 
+	dfTrain.Normalization()
+	dfTest.Normalization()
+
 	nn := neural_network.NewNeuralNetwork([]int{784, 30, 10})
 	nn.Sgd(&dfTrain, 1, 10, 0.01, 5, true)
 
