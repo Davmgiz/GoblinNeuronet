@@ -52,11 +52,13 @@ func (nn NeuralNetwork) feedforward(x matrix.Matrix) matrix.Matrix {
 	return x
 }
 
-func (nn NeuralNetwork) Sgd(dataTrain *data_frame.DataFrame, epochs int, miniBatchSize int, eta float64, lmd float64) {
+func (nn NeuralNetwork) Sgd(dataTrain *data_frame.DataFrame, epochs int, miniBatchSize int, eta float64, lmd float64, isPrintEpoch bool) {
 	for epoch := 0; epoch < epochs; epoch++ {
 
 		// вывод текущей эпохи
-		fmt.Println("epoch :", epoch+1)
+		if isPrintEpoch {
+			fmt.Println("epoch :", epoch+1)
+		}
 
 		// перемешивание датафрейма
 		dataTrain.Shuffle()

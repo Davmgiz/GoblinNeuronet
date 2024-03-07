@@ -27,7 +27,7 @@ func main() {
 	dfTrain.Num2Vec(10)
 
 	nn := neural_network.NewNeuralNetwork([]int{784, 30, 10})
-	nn.Sgd(&dfTrain, 1, 10, 0.01, 5)
+	nn.Sgd(&dfTrain, 1, 10, 0.01, 5, true)
 
 	fmt.Println("Accuracy: ", nn.Accuracy(dfTest))
 

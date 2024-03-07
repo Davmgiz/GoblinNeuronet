@@ -61,13 +61,21 @@ func randMatrix(rows, columns int) *myMatrix {
 }
 
 // геттер строк матрицы
-func (M myMatrix) getRows() int {
+func (M *myMatrix) getRows() int {
 	return M.rows
 }
 
 // геттер столбцов матрицы
-func (M myMatrix) getColumns() int {
+func (M *myMatrix) getColumns() int {
 	return M.columns
+}
+
+func (M *myMatrix) getIJ(i, j int) float64 {
+	return M.data[i][j]
+}
+
+func (M *myMatrix) setIJ(i, j int, x float64) {
+	M.data[i][j] = x
 }
 
 // функция выводит на экран

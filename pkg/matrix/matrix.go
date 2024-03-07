@@ -51,6 +51,14 @@ func (M Matrix) GetRows() int {
 	return M.matrix.getRows()
 }
 
+func (M Matrix) GetIJ(i, j int) float64 {
+	return M.matrix.getIJ(i, j)
+}
+
+func (M Matrix) SetIJ(i, j int, x float64) {
+	M.matrix.setIJ(i, j, x)
+}
+
 func (A Matrix) Dot(B Matrix) Matrix {
 	return Matrix{
 		matrix: A.matrix.dot(B.matrix),

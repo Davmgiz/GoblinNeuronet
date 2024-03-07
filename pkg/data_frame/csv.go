@@ -71,12 +71,8 @@ func ReadCSV(filename string, capacity int) (DataFrame, error) {
 			if err != nil {
 				return DataFrame{}, fmt.Errorf("incorrect csv file format: %v", err)
 			}
-			if i == 0 {
-				recordDataFloat64[i] = num
-			} else {
-				recordDataFloat64[i] = num / 255.
-			}
-			//recordDataFloat64[i] = num / 255.
+
+			recordDataFloat64[i] = num
 		}
 
 		// добавляем в новую строку датафрейма целевую переменную и признаки

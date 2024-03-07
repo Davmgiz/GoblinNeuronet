@@ -8,8 +8,7 @@ import (
 // Запуск только данного теста производится из текущей директории.
 // Тест можно запустить находясь в корневой директории с помощью запуска всех тестов (go test ./...)
 func TestReadCSV(t *testing.T) {
-
-	res, err := ReadCSV("../../data/test_read_csv.csv", 4)
+	res, err := ReadCSV("../../data/data_frame_test/test_read_csv.csv", 4)
 	if err != nil {
 		t.Error(err)
 	}
@@ -65,4 +64,28 @@ func TestReadCSV(t *testing.T) {
 		}
 	}
 
+}
+
+func TestNormalization(t *testing.T) {
+	result, err := ReadCSV("../../data/data_frame_test/test_normalization.csv", 10)
+	if err != nil {
+		t.Error(err)
+	}
+
+	result.Normalization()
+
+	expected, err := ReadCSV("../../data/data_frame_test/test_normalization_expected.csv", 10)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if expected.Length() != result.Length() {
+		t.Errorf("Dont equal length expected data frame and result data frame")
+	}
+
+	for i := 0; i < result.Length(); i++ {
+		if !matrix.IsMatrixesEqual(expected.Data[i].x, result.Data[i].x) {
+			t.Errorf("Dont equal expected data frame and result data frame")
+		}
+	}
 }

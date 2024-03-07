@@ -3,6 +3,7 @@ package data_frame
 import (
 	"NN/pkg/matrix"
 	"log"
+	"math"
 	"math/rand"
 	"time"
 )
@@ -63,4 +64,38 @@ func (df *DataFrame) Num2Vec(n int) {
 		df.Data[i].y = target
 	}
 
+}
+
+func (df *DataFrame) Normalization() {
+	if len(df.Data) == 0 {
+		log.Fatal("Empty data frame to do normalization")
+	}
+
+	maxAll := make([]float64, df.Data[0].x.GetRows())
+
+	for i := 0; i < df.Length(); i++ {
+		for j := 0; j < df.Data[0].x.GetRows(); j++ {
+			maxAll[j] = maxF64(math.Abs(df.Data[i].x.GetIJ(j, 0)), maxAll[j])
+		}
+	}
+
+	for i := 0; i < len(maxAll); i++ {
+		if maxAll[i] == 0 {
+			maxAll[i] = 1
+		}
+	}
+
+	for i := 0; i < df.Length(); i++ {
+		for j := 0; j < df.Data[0].x.GetRows(); j++ {
+			df.Data[i].x.SetIJ(j, 0, df.Data[i].x.GetIJ(j, 0)/maxAll[j])
+		}
+	}
+
+}
+
+func maxF64(a, b float64) float64 {
+	if a > b {
+		return a
+	}
+	return b
 }
