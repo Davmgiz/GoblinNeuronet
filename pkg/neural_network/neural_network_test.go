@@ -1,11 +1,16 @@
 package neural_network
 
 import (
-	"NN/pkg/data_frame"
-	"NN/pkg/matrix"
 	"testing"
+
+	"github.com/Davmgiz/GoblinNeuronet/pkg/data_frame"
+	"github.com/Davmgiz/GoblinNeuronet/pkg/matrix"
 )
 
+// TestSvg проверяет правильно ли обучилась нейронная сеть (структура NeuralNetwork) с помощью
+// фиксированного и правильного результата.
+// Функция предназначена для быстрых изменений методов обучения и проверки корректности результата.
+// Пока что функция может проверить единственную функцию активации сигмоиду.
 func TestSvg(t *testing.T) {
 	var w1 = matrix.DataToMatrix([][]float64{
 		{1., 2., 3., 4.},
@@ -33,11 +38,12 @@ func TestSvg(t *testing.T) {
 
 	var biases = []matrix.Matrix{b1, b2}
 
-	nn := NewNeuralNetwork([]int{4, 3, 2})
+	nn := NewNeuralNetwork([]int{4, 3, 2}, Sigmoid{})
 
 	nn.weights = weights
 	nn.biases = biases
 
+	// тестовый датасет
 	dfTrain, err := data_frame.ReadCSV("../../data/neural_network_test/test_svg_data_train.csv", 10)
 	if err != nil {
 		t.Errorf("%s", err)
@@ -45,7 +51,7 @@ func TestSvg(t *testing.T) {
 
 	dfTrain.Num2Vec(2)
 
-	nn.Sgd(&dfTrain, 200, 7, 0.5, 5, false)
+	nn.Sgd(&dfTrain, 200, 7, 0.5, 5, false, false)
 
 	expectedWeights := []matrix.Matrix{
 		matrix.DataToMatrix([][]float64{
@@ -71,6 +77,8 @@ func TestSvg(t *testing.T) {
 		}),
 	}
 
+	// проверка весов и смещений
+
 	if len(nn.biases) != len(expectedBiases) || len(nn.weights) != len(expectedWeights) {
 		t.Errorf("Different dimension expected weights and result weights or expected biases and result biases")
 	}
@@ -89,6 +97,8 @@ func TestSvg(t *testing.T) {
 
 }
 
+// TestFeedForward проверяет выдает ли нейронная сеть (структура NeuralNetwork) фиксированный и правильный результат.
+// Пока что функция может проверить единственную функцию активации сигмоиду.
 func TestFeedForward(t *testing.T) {
 	var w1 = matrix.DataToMatrix([][]float64{
 		{0.001, 0.002, 0.003, 0.004},
@@ -116,7 +126,7 @@ func TestFeedForward(t *testing.T) {
 
 	var biases = []matrix.Matrix{b1, b2}
 
-	nn := NewNeuralNetwork([]int{4, 3, 2})
+	nn := NewNeuralNetwork([]int{4, 3, 2}, Sigmoid{})
 
 	nn.weights = weights
 	nn.biases = biases

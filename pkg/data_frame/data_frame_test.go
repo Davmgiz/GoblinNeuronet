@@ -1,12 +1,14 @@
 package data_frame
 
 import (
-	"NN/pkg/matrix"
 	"testing"
+
+	"github.com/Davmgiz/GoblinNeuronet/pkg/matrix"
 )
 
+// TestReadCSV проверяет создание датафрейма (структуры DataFrame) из csv файла.
 // Запуск только данного теста производится из текущей директории.
-// Тест можно запустить находясь в корневой директории с помощью запуска всех тестов (go test ./...)
+// Тест можно запустить находясь в корневой директории с помощью запуска всех тестов (go test ./...).
 func TestReadCSV(t *testing.T) {
 	res, err := ReadCSV("../../data/data_frame_test/test_read_csv.csv", 4)
 	if err != nil {
@@ -66,6 +68,9 @@ func TestReadCSV(t *testing.T) {
 
 }
 
+// TestNormalization нормализацию датафрейма (структуры DataFrame).
+// Запуск только данного теста производится из текущей директории.
+// Тест можно запустить находясь в корневой директории с помощью запуска всех тестов (go test ./...).
 func TestNormalization(t *testing.T) {
 	result, err := ReadCSV("../../data/data_frame_test/test_normalization.csv", 10)
 	if err != nil {
@@ -79,11 +84,11 @@ func TestNormalization(t *testing.T) {
 		t.Error(err)
 	}
 
-	if expected.Length() != result.Length() {
+	if expected.Lenght() != result.Lenght() {
 		t.Errorf("Dont equal length expected data frame and result data frame")
 	}
 
-	for i := 0; i < result.Length(); i++ {
+	for i := 0; i < result.Lenght(); i++ {
 		if !matrix.IsMatrixesEqual(expected.Data[i].x, result.Data[i].x) {
 			t.Errorf("Dont equal expected data frame and result data frame")
 		}

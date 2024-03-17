@@ -1,7 +1,6 @@
 package data_frame
 
 import (
-	"NN/pkg/matrix"
 	"encoding/csv"
 	"errors"
 	"fmt"
@@ -10,19 +9,22 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/Davmgiz/GoblinNeuronet/pkg/matrix"
 )
 
-//ссылка на набор данных
-//https://www.kaggle.com/datasets/oddrationale/mnist-in-csv?resource=download&select=mnist_train.csv
-
+// Настройка разделителей формата csv.
 var (
 	sep   string = "," // разделитель в ячейке между данными
 	comma rune   = ';' // разделитель между ячейками
 )
 
-// Считывает датасет из CSV и возвращает датафрейм с этими же данными.
+// ReadCSV возвращает считанный датафрейм из csv (структуру DataFrame) и ошибку.
+// Функция принимает название CSV файла и предполагаемый размер датасета.
 // Функция может работать только с CSV файлами в которых содержатся только числа.
-// Принимает название CSV файла и предполагаемый размер датасета.
+// Возвращает ошибку, если: не удалось открыть файл,
+// возникли ошибки при чтении, в csv формате содержатся не числа,
+// данные разных наблюдений имеют разную длину по столбцам.
 func ReadCSV(filename string, capacity int) (DataFrame, error) {
 	// открытие csv файла
 	file, err := os.Open(filename)
@@ -34,7 +36,7 @@ func ReadCSV(filename string, capacity int) (DataFrame, error) {
 	reader := csv.NewReader(file)
 	reader.Comma = comma
 
-	// cap + 2, чтобы был запас на всякий случай
+	// capacity + 2, чтобы был запас на всякий случай
 	data := make([]*rowDataFrame, 0, capacity+2)
 
 	minLenRecord := math.MaxInt
@@ -76,7 +78,6 @@ func ReadCSV(filename string, capacity int) (DataFrame, error) {
 		}
 
 		// добавляем в новую строку датафрейма целевую переменную и признаки
-		//y := recordDataFloat64[0]
 		y := matrix.Zero(1, 1)
 		y.Slice2Matrix([]float64{recordDataFloat64[0]})
 		x := matrix.Zero(len(recordDataFloat64)-1, 1)
@@ -91,6 +92,7 @@ func ReadCSV(filename string, capacity int) (DataFrame, error) {
 
 	}
 
+	// Контролируем чтобы все наблюдения были равными по длине
 	if maxLenRecord != minLenRecord {
 		return DataFrame{}, errors.New("unequal size of records in csv")
 	}
@@ -100,6 +102,7 @@ func ReadCSV(filename string, capacity int) (DataFrame, error) {
 	}, nil
 }
 
+// max вспомогательная функция для ReadCSV.
 func max(a, b int) int {
 	if a > b {
 		return a
@@ -107,6 +110,7 @@ func max(a, b int) int {
 	return b
 }
 
+// min вспомогательная функция для ReadCSV.
 func min(a, b int) int {
 	if a < b {
 		return a
