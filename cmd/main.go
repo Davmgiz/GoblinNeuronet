@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/Davmgiz/GoblinNeuronet/pkg/data_frame"
-	"github.com/Davmgiz/GoblinNeuronet/pkg/neural_network"
+	goblinet "github.com/Davmgiz/GoblinNeuronet/pkg/neural_network"
 )
 
 // Запуск main.go допустим только из корневой директории проекта.
@@ -45,7 +45,7 @@ func main() {
 	// Последний выходной слой будет содержать 10 нейронов, так как всего 10 цифр.
 	// В остальных (скрытых) слоях количество нейронов выбирается в результате экспериментов.
 	// Так же будем использовать сигмоидальную функцию активации.
-	nn := neural_network.NewNeuralNetwork([]int{784, 30, 10}, neural_network.Sigmoid{})
+	nn := goblinet.NewNeuralNetwork([]int{784, 30, 10}, goblinet.Sigmoid{})
 
 	// Обучаем нейронную сеть с помощью стохастического градиентного спуска.
 	// Передаем указатель на данные на которых будет происходить обучение,
