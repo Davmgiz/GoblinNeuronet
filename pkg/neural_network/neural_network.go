@@ -101,6 +101,7 @@ func (nn *NeuralNetwork) feedforward(x matrix.Matrix) matrix.Matrix {
 // если ошибка для выходного слоя не определена в методе нейронной сети (структуре NeuralNetwork) backProp,
 // поскольку внутренне вызывается функция backProp, требующая явного определения
 // ошибки для выходного слоя для каждой активационной функции.
+// Функция вызывает панику, если возникла ошибка при нормализации дата сета.
 func (nn *NeuralNetwork) Sgd(dataTrain *data_frame.DataFrame, epochs int, miniBatchSize int, eta float64, lmd float64, isPrintEpoch, haveNormalization bool) {
 
 	// если включена нормализация, то выполняем нормализацию и сохраняем

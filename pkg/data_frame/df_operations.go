@@ -69,6 +69,8 @@ func (df *DataFrame) Normalization() (matrix.Matrix, error) {
 	for i := 0; i < len(maxAll); i++ {
 		if maxAll[i] == 0 {
 			maxAll[i] = 1
+		} else {
+			maxAll[i] = 1. / maxAll[i]
 		}
 	}
 
