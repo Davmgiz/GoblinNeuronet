@@ -11,21 +11,22 @@ import (
 
 // Запуск main.go допустим только из корневой директории проекта.
 // Обучение производится на датасете MNIST,
-// ссылка на набор данных: https://www.kaggle.com/datasets/oddrationale/mnist-in-csv?resource=download
+// ссылка на набор данных: https://www.kaggle.com/datasets/oddrationale/mnist-in-csv?resource=download.
+// Самого датасета в директории нет.
 func main() {
 
 	// Засекаем время.
 	startTime := time.Now()
 
 	// Считываем данные для обучения.
-	dfTrain, err := data_frame.ReadCSV("data/mnist_train.csv", 60000)
+	dfTrain, err := data_frame.ReadCSV("mnist_train.csv", 60000)
 	if err != nil {
 		log.Fatal(err)
 	}
 	fmt.Println("Data train read")
 
 	// Считываем данные для теста.
-	dfTest, err := data_frame.ReadCSV("data/mnist_test.csv", 10000)
+	dfTest, err := data_frame.ReadCSV("mnist_test.csv", 10000)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -61,7 +62,7 @@ func main() {
 
 	// Записываем параметры для нейронной сети в файл net_par.txt,
 	// чтобы использовать их в следующие разы и снова не обучать нейронную сеть.
-	nn.WriteToFile("data/network_parameters/net_par.txt")
+	nn.WriteToFile("net_par.txt")
 
 	// Выводим время выполнения.
 	elapsedTime := time.Since(startTime)

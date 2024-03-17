@@ -7,7 +7,8 @@
 
 ## Особенности
 
-- Встроенные операции с матрицами для эффективных вычислений.
+- Встроенные операции с матрицами.
+- Встроенные операции с набором данных.
 - Утилиты для работы с данными в формате CSV.
 - Примеры использования для быстрого старта.
 
@@ -37,14 +38,14 @@ import (
 func main() {
 
 	// Считываем данные для обучения.
-	dfTrain, err := data_frame.ReadCSV("data/mnist_train.csv", 60000)
+	dfTrain, err := data_frame.ReadCSV("mnist_train.csv", 60000)
 	if err != nil {
 		log.Fatal(err)
 	}
 	fmt.Println("Data train read")
 
 	// Считываем данные для теста.
-	dfTest, err := data_frame.ReadCSV("data/mnist_test.csv", 10000)
+	dfTest, err := data_frame.ReadCSV("mnist_test.csv", 10000)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -99,7 +100,7 @@ import (
 func main() {
 
 	// Считываем данные для теста.
-	dfTest, err := data_frame.ReadCSV("data/mnist_test.csv", 10000)
+	dfTest, err := data_frame.ReadCSV("mnist_test.csv", 10000)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -114,6 +115,17 @@ func main() {
 	// Печатаем метрику оценки качества (количество правильно угаданных цифр).
 	fmt.Println("Accuracy: ", nn.Accuracy(dfTest))
 }
+```
+
+## Запуск тестов
+
+Для запуска тестов перейдите в директорию, содержащую тестовые файлы, и выполните команду запуска тестов. Убедитесь, что вы находитесь в соответствующей директории, так как тесты настроены на запуск из своих локальных директорий.
+
+Пример для директории `pkg/matrix`:
+
+```bash
+cd pkg/matrix
+go test
 ```
 
 ## Документация
